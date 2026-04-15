@@ -8,9 +8,7 @@ from .models import Post
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    posts = Post.objects.select_related("owner").order_by(
-        "-created_time"
-    )
+    posts = Post.objects.select_related("owner").order_by("-created_time")
 
     paginator = Paginator(posts, 5)
     page_number: str | None = request.GET.get("page")
@@ -26,29 +24,28 @@ def index(request: HttpRequest) -> HttpResponse:
 
 def post_detail(request: HttpRequest, pk: int) -> HttpResponse:
     post = get_object_or_404(Post, pk=pk)
+    comments = post.comments.all()
 
     if request.method == "POST":
-        if not request.user.is_authenticated:
-            return redirect("login")
-
         form = CommentaryForm(request.POST)
-        if form.is_valid():
-            commentary = form.save(commit=False)
-            commentary.user = request.user
-            commentary.post = post
-            commentary.save()
-            return redirect("blog:post-detail", pk=pk)
+
+        if request.user.is_authenticated:
+            if form.is_valid():
+                commentary = form.save(commit=False)
+                commentary.user = request.user
+                commentary.post = post
+                commentary.save()
+                return redirect("blog:post-detail", pk=pk)
+        else:
+            form.add_error(None, "You must be logged in to comment")
+
     else:
         form = CommentaryForm()
 
     context: dict[str, Any] = {
         "post": post,
-        "comments": post.comments.all(),
+        "comments": comments,
         "form": form,
     }
 
-    return render(
-        request,
-        "blog/post_detail.html",
-        context,
-    )
+    return render(request, "blog/post_detail.html", context)

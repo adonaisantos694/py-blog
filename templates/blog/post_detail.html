@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ post.title }}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>{{ post.title }}</h1>
@@ -29,14 +31,17 @@
 
     <h2>Add Comment</h2>
 
-    {% if user.is_authenticated %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Submit</button>
-        </form>
-    {% else %}
-        <p>You must be logged in to comment</p>
+    <form method="post">
+        {% csrf_token %}
+
+        {% load crispy_forms_tags %}
+        {% crispy form %}
+    </form>
+
+    {% if form.non_field_errors %}
+        <div>
+            {{ form.non_field_errors }}
+        </div>
     {% endif %}
 </body>
 </html>

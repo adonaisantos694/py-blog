@@ -1,15 +1,12 @@
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 SECRET_KEY = "django-insecure-change-this-key"
 
 DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
-
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -19,9 +16,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "crispy_forms",
+    "crispy_bootstrap4",
     "blog.apps.BlogConfig",
 ]
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -33,9 +30,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "blog_system.urls"
-
 
 TEMPLATES = [
     {
@@ -53,9 +48,7 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = "blog_system.wsgi.application"
-
 
 DATABASES = {
     "default": {
@@ -63,7 +56,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -88,7 +80,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -97,25 +88,18 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 AUTH_USER_MODEL = "blog.User"
 
-
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-
 LOGIN_URL = "login"
-
-LOGIN_REDIRECT_URL = "index"
-
-LOGOUT_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "blog:index"
+LOGOUT_REDIRECT_URL = "blog:index"
