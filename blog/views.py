@@ -8,14 +8,13 @@ from .models import Post
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    posts = Post.objects.select_related("owner").order_by("-created_time")
+    posts = Post.objects.select_related("owner")
 
     paginator = Paginator(posts, 5)
     page_number: str | None = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context: dict[str, Any] = {
-        "post_list": page_obj.object_list,
         "page_obj": page_obj,
     }
 
@@ -24,7 +23,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
 def post_detail(request: HttpRequest, pk: int) -> HttpResponse:
     post = get_object_or_404(Post, pk=pk)
-    comments = post.comments.all()
+    comments = post.comments.select_related("user").all()
 
     if request.method == "POST":
         form = CommentaryForm(request.POST)
@@ -38,11 +37,10 @@ def post_detail(request: HttpRequest, pk: int) -> HttpResponse:
                 return redirect("blog:post-detail", pk=pk)
         else:
             form.add_error(None, "You must be logged in to comment")
-
     else:
         form = CommentaryForm()
 
-    context: dict[str, Any] = {
+    context: Any = {
         "post": post,
         "comments": comments,
         "form": form,
