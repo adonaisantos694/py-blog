@@ -16,6 +16,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
     context: dict[str, Any] = {
         "page_obj": page_obj,
+        "post_list": page_obj.object_list,
     }
 
     return render(request, "blog/index.html", context)
@@ -23,7 +24,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
 def post_detail(request: HttpRequest, pk: int) -> HttpResponse:
     post = get_object_or_404(Post, pk=pk)
-    comments = post.comments.select_related("user").all()
+    comments = post.comments.select_related("user")
 
     if request.method == "POST":
         form = CommentaryForm(request.POST)
@@ -35,12 +36,13 @@ def post_detail(request: HttpRequest, pk: int) -> HttpResponse:
                 commentary.post = post
                 commentary.save()
                 return redirect("blog:post-detail", pk=pk)
+
         else:
             form.add_error(None, "You must be logged in to comment")
     else:
         form = CommentaryForm()
 
-    context: Any = {
+    context: dict[str, Any] = {
         "post": post,
         "comments": comments,
         "form": form,
